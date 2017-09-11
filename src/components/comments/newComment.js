@@ -8,13 +8,13 @@ class Comment extends Component{
 
 	handleSubmit = (e) =>{
 		e.preventDefault()
-		const {history,location,updateCommentsList,dispatch}=this.props
+		const {history,location,updateCommentsList,createNewComment}=this.props
 		const id = location.pathname.split('/')[2]
 		const body = serializeForm(e.target, {hash:true})
 		body['id'] = uuid()
 		body['timestamp'] = Date.now()
 		body['parentId'] = id
-		dispatch(createNewComment(body))
+		createNewComment(body)
 		history.push(`/posts/${id}`)
 		updateCommentsList(id)
 	}
@@ -49,4 +49,4 @@ const mapStateToProps = (state) => ({
   posts:state.posts,
 })
 
-export default connect(mapStateToProps)(Comment)
+export default connect(mapStateToProps,{createNewComment})(Comment)

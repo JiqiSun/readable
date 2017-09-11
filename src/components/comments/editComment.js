@@ -10,20 +10,20 @@ class EditComment extends Component{
 	}
 
 	componentDidMount() {
-		const {location,dispatch} = this.props
+		const {location,fetchComment} = this.props
 		const id = location.pathname.split('/')[2]
-    	dispatch(fetchComment(id))
+    	fetchComment(id)
     	this.setState({id})
 	}
 
 	handleSubmit = (e) =>{
 		e.preventDefault()
-		const {history,updateCommentsList,dispatch,comment} = this.props
+		const {history,updateCommentsList,comment,updateComment} = this.props
 		const {id} = this.state
 		const body = serializeForm(e.target, {hash:true})
 		const date = Date.now()
 		body['timestamp'] = date
-		dispatch(updateComment(id,body))
+		updateComment(id,body)
 		history.push(`/posts/${comment.parentId}`)
 		updateCommentsList(comment.parentId)
 	}
@@ -59,4 +59,4 @@ const mapStateToProps = (state) => ({
   comment:state.comments.items
 })
 
-export default connect(mapStateToProps)(EditComment)
+export default connect(mapStateToProps,{fetchComment,updateComment})(EditComment)

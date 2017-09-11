@@ -10,11 +10,11 @@ let postId = null
 
 class ViewPost extends Component{
 	componentDidMount() {
-		const {location,dispatch} = this.props
+		const {location,fetchPost,fetchAllComments} = this.props
 		const id = location.pathname.split('/')[2]
-    	dispatch(fetchPost(id))
+    	fetchPost(id)
     	postId = id
-    	dispatch(fetchAllComments(id,'ORDER_COMMENTS_BY_HIGHTEST_SCORE','des','voteScore'))
+    	fetchAllComments(id,'ORDER_COMMENTS_BY_HIGHTEST_SCORE','des','voteScore')
 	}
 
 	handleDelete = () => {
@@ -26,28 +26,28 @@ class ViewPost extends Component{
 
 	handleVote = (e,vote) =>{
 		e.preventDefault()	
-		const{dispatch,updatePostsList} = this.props
+		const{updatePostVote,fetchPost,updatePostsList} = this.props
 		let body = {}
 		if (vote === 'up') {
 			body['option']="upVote"
 		} else {
 			body['option']="downVote"
 		}
-		dispatch(updatePostVote(postId,body))
-		dispatch(fetchPost(postId))
+		updatePostVote(postId,body)
+		fetchPost(postId)
 		updatePostsList()
 	}
 
 	handleSort = (value) =>{
-	  const {dispatch} = this.props
+	  const {fetchAllComments} = this.props
 	  if (value==="LowestVoteScore"){
-	      dispatch(fetchAllComments(postId,'ORDER_COMMENTS_BY_LOWEST_SCORE','asc','voteScore'))
+	      fetchAllComments(postId,'ORDER_COMMENTS_BY_LOWEST_SCORE','asc','voteScore')
 	  } else if (value==="LatestDate"){
-	      dispatch(fetchAllComments(postId,'ORDER_COMMENTS_BY_LATEST_DATE','des','timestamp'))
+	      fetchAllComments(postId,'ORDER_COMMENTS_BY_LATEST_DATE','des','timestamp')
 	  } else if (value==="OldestDate"){
-	      dispatch(fetchAllComments(postId,'ORDER_COMMENTS_BY_OLDEST_DATE','asc','timestamp'))
+	      fetchAllComments(postId,'ORDER_COMMENTS_BY_OLDEST_DATE','asc','timestamp')
 	  } else {
-	      dispatch(fetchAllComments(postId,'ORDER_COMMENTS_BY_HIGHTEST_SCORE','des','voteScore'))
+	      fetchAllComments(postId,'ORDER_COMMENTS_BY_HIGHTEST_SCORE','des','voteScore')
 	  }
 	}
 
@@ -56,29 +56,31 @@ class ViewPost extends Component{
 		const {post,comments} = this.props
 		return(
 			<div className="col-lg-8 mx-auto" style={{'margin':'20px'}}>
-				<div >
-					<h2>{capitalize(post.title)}</h2>
-	  					<small className="text-muted">Posts by {capitalize(post.author)} on {new Date(post.timestamp).toDateString()}, 
-	  					Vote Score: {post.voteScore}</small>	
-					<p>{post.body}</p>
-					<div className="btn-toolbar">
-						<div className="btn-group mr-2">
-							<button className="btn btn-success" onClick={(e)=>{this.handleVote(e,'up')}}>Like</button>
-							<button className="btn btn-warning" onClick={(e)=>{this.handleVote(e,'down')}}>Dislike</button>
+			  	{ post.deleted === false ?
+					(<div>
+						<h2>{capitalize(post.title)}</h2>
+		  					<small className="text-muted">Posts by {capitalize(post.author)} on {new Date(post.timestamp).toDateString()}, 
+		  					Vote Score: {post.voteScore}</small>	
+						<p>{post.body}</p>
+						<div className="btn-toolbar">
+							<div className="btn-group mr-2">
+								<button className="btn btn-success" onClick={(e)=>{this.handleVote(e,'up')}}>Like</button>
+								<button className="btn btn-warning" onClick={(e)=>{this.handleVote(e,'down')}}>Dislike</button>
+							</div>
+							<div className="btn-group mr-2 ">
+								<Link to={`/posts/${postId}/edit`} className="btn btn-primary">Edit</Link>
+								<button className="btn btn-danger" onClick={this.handleDelete}>Delete</button>
+							</div>
+							<div className="btn-group mr-2 ">
+								<Link to={`/posts/${postId}/add-comments`} className="btn btn-primary">Add Comment</Link>
+							</div>	
 						</div>
-						<div className="btn-group mr-2 ">
-							<Link to={`/posts/${postId}/edit`} className="btn btn-primary">Edit</Link>
-							<button className="btn btn-danger" onClick={this.handleDelete}>Delete</button>
-						</div>
-						<div className="btn-group mr-2 ">
-							<Link to={`/posts/${postId}/add-comments`} className="btn btn-primary">Add Comment</Link>
-						</div>	
-					</div>
-				</div>
-				<ShowAllComments
+					</div>) : (<h2>Page not found</h2>) } 
+				{ post.deleted === false ?
+				(<ShowAllComments
 					comments = {comments}
 					handleSort = {this.handleSort}
-				/>				
+				/>): null }			
 			</div>
 		)
 	}
@@ -90,4 +92,4 @@ const mapStateToProps = (state) => ({
   comments:state.sortComments.items
 })
 
-export default connect(mapStateToProps)(ViewPost)
+export default connect(mapStateToProps,{fetchPost,updatePostVote,fetchAllComments})(ViewPost)

@@ -8,9 +8,9 @@ class EditPost extends Component{
 	handleSubmit = (e) =>{
 		e.preventDefault()
 		const body = serializeForm(e.target, {hash:true})
-		const {location,history,updatePostsList,dispatch} = this.props
+		const {location,history,updatePostsList,updatePost} = this.props
 		const id = location.pathname.split('/')[2]
-		dispatch(updatePost(id,body))
+		updatePost(id,body)
 		history.push(`/posts/${id}`)
 		updatePostsList()
 	}
@@ -46,4 +46,4 @@ const mapStateToProps = (state) => ({
   post:state.posts.items
 })
 
-export default connect(mapStateToProps)(EditPost)
+export default connect(mapStateToProps,{updatePost})(EditPost)

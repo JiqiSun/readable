@@ -10,11 +10,11 @@ class post extends Component{
 	
 	handleSubmit = (e) =>{
 		e.preventDefault()
-		const{history,updatePostsList,dispatch}=this.props
+		const{history,updatePostsList,creatNewPost}=this.props
 		const body = serializeForm(e.target, {hash:true})
 		body['id'] = uuid()
 		body['timestamp'] = Date.now()
-		dispatch(creatNewPost(body))
+		creatNewPost(body)
 		history.push('/')
 		updatePostsList()
 	}
@@ -68,4 +68,4 @@ const mapStateToProps = (state) => ({
   posts:state.posts,
 })
 
-export default connect(mapStateToProps)(post)
+export default connect(mapStateToProps,{creatNewPost})(post)

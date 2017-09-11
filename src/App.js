@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Route, withRouter } from 'react-router-dom';
-import {fetchCategories,fetchAllPosts,fetchAllComments,fetchPostsByCategory,countComment} from './actions';
+import * as actions from './actions';
 import { connect } from 'react-redux';
 import Nav from './components/nav';
 import ShowAllPosts from './components/posts/showAllposts';
@@ -11,63 +11,61 @@ import EditPost from './components/posts//editPost';
 import EditComment from './components/comments//editComment';
 import NewComment from './components/comments//newComment';
 
+
+
 class App extends Component {
 
   componentDidMount () {
-    const {dispatch} = this.props
-    dispatch(fetchCategories())
-    dispatch(fetchAllPosts('ORDER_POSTS_BY_HIGHTEST_SCORE','des','voteScore'))
-    dispatch(countComment())
+    this.props.fetchCategories()
+    this.props.fetchAllPosts('ORDER_POSTS_BY_HIGHTEST_SCORE','des','voteScore')
+    this.props.countComment()
   }
 
   filterPosts = (category) =>{
-    const {dispatch} = this.props
     if (category==="all"){
-      dispatch(fetchAllPosts('ORDER_POSTS_BY_HIGHTEST_SCORE','des','voteScore'))
+      this.props.fetchAllPosts('ORDER_POSTS_BY_HIGHTEST_SCORE','des','voteScore')
     } else {
-      dispatch(fetchPostsByCategory(category,'ORDER_POSTS_BY_HIGHTEST_SCORE','des','voteScore'))
+       this.props.fetchPostsByCategory(category,'ORDER_POSTS_BY_HIGHTEST_SCORE','des','voteScore')
     }  
   }
 
   handleSort = (value) =>{
-    const {dispatch} = this.props
+    const {fetchAllPosts} = this.props 
     if (value==="LowestVoteScore"){
-        dispatch(fetchAllPosts('ORDER_POSTS_BY_LOWEST_SCORE','asc','voteScore'))
+         fetchAllPosts('ORDER_POSTS_BY_LOWEST_SCORE','asc','voteScore')
     } else if (value==="LatestDate"){
-        dispatch(fetchAllPosts('ORDER_POSTS_BY_LATEST_DATE','des','timestamp'))
+         fetchAllPosts('ORDER_POSTS_BY_LATEST_DATE','des','timestamp')
     } else if (value==="OldestDate"){
-        dispatch(fetchAllPosts('ORDER_POSTS_BY_OLDEST_DATE','asc','timestamp'))
+         fetchAllPosts('ORDER_POSTS_BY_OLDEST_DATE','asc','timestamp')
     } else {
-        dispatch(fetchAllPosts('ORDER_POSTS_BY_HIGHTEST_SCORE','des','voteScore'))
+         fetchAllPosts('ORDER_POSTS_BY_HIGHTEST_SCORE','des','voteScore')
     }
   }
 
   handleFilteredPostsSort = (category,value) =>{
-    const {dispatch} = this.props
+    const {fetchPostsByCategory} = this.props
     if (value==="LowestVoteScore"){
-        dispatch(fetchPostsByCategory(category,'ORDER_POSTS_BY_LOWEST_SCORE','asc','voteScore'))
+         fetchPostsByCategory(category,'ORDER_POSTS_BY_LOWEST_SCORE','asc','voteScore')
     } else if (value==="LatestDate"){
-        dispatch(fetchPostsByCategory(category,'ORDER_POSTS_BY_LATEST_DATE','des','timestamp'))
+         fetchPostsByCategory(category,'ORDER_POSTS_BY_LATEST_DATE','des','timestamp')
     } else if (value==="OldestDate"){
-        dispatch(fetchPostsByCategory(category,'ORDER_POSTS_BY_OLDEST_DATE','asc','timestamp'))
+         fetchPostsByCategory(category,'ORDER_POSTS_BY_OLDEST_DATE','asc','timestamp')
     } else {
-        dispatch(fetchPostsByCategory(category,'ORDER_POSTS_BY_HIGHTEST_SCORE','des','voteScore'))
+         fetchPostsByCategory(category,'ORDER_POSTS_BY_HIGHTEST_SCORE','des','voteScore')
     }
   }
 
   updatePostsList =(category) => {
-    const {dispatch} = this.props
     if (category) {
-      dispatch(fetchPostsByCategory(category,'ORDER_POSTS_BY_HIGHTEST_SCORE','des','voteScore'))
+       this.props.fetchPostsByCategory(category,'ORDER_POSTS_BY_HIGHTEST_SCORE','des','voteScore')
     } else{
-      dispatch(fetchAllPosts('ORDER_POSTS_BY_HIGHTEST_SCORE','des','voteScore'))
+       this.props.fetchAllPosts('ORDER_POSTS_BY_HIGHTEST_SCORE','des','voteScore')
     }
   }
 
   updateCommentsList =(id) => {
-    const {dispatch} = this.props
-    dispatch(fetchAllComments(id,'ORDER_COMMENTS_BY_HIGHTEST_SCORE','des','voteScore'))
-    dispatch(countComment())
+     this.props.fetchAllComments(id,'ORDER_COMMENTS_BY_HIGHTEST_SCORE','des','voteScore')
+     this.props.countComment()
   }
 
   render() {
@@ -143,4 +141,4 @@ const mapStateToProps = ({categories,posts,sortPosts,countComment}) => ({
   commentCount: countComment.count
 })
 
-export default withRouter(connect(mapStateToProps)(App));
+export default withRouter(connect(mapStateToProps,actions)(App));
